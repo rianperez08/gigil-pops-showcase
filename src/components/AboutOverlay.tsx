@@ -30,31 +30,28 @@ const AboutOverlay = ({ isOpen, onClose }: AboutOverlayProps) => {
 
   return (
     <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center px-6 md:px-16 lg:px-24 overflow-auto animate-fade-in">
-      {/* About Us label top-right */}
-      <span className="fixed top-6 right-6 text-white uppercase tracking-widest text-sm font-medium">
-        About Us
-      </span>
-
-      {/* Close button - hidden visually but still works via click anywhere or Esc */}
+      {/* Close X button top-right */}
       <button
         onClick={onClose}
-        className="fixed top-6 left-6 p-2 hover:bg-white/10 rounded-full transition-colors z-50 opacity-0 hover:opacity-100"
+        className="fixed top-6 right-6 p-2 hover:bg-white/10 rounded-full transition-colors z-50"
         aria-label="Close"
       >
-        <X className="w-5 h-5 text-white" />
+        <X className="w-6 h-6 text-white" />
       </button>
 
       {/* Main content */}
       <div className="flex-1 flex flex-col items-center justify-center max-w-5xl w-full py-20">
-        {/* Large impact text - matching reference exactly */}
-        <h2 className="uppercase font-bold leading-[1.15] tracking-tight text-center" style={{ 
-          fontSize: 'clamp(1.25rem, 4.5vw, 3.5rem)',
-          fontStyle: 'italic'
-        }}>
-          <span className="text-primary italic">GIGIL POPS</span>{" "}
-          <span className="text-white not-italic">IS GIGIL'S MONTHLY EDITORIAL PUBLICATION AT THE CROSSROADS OF CREATIVITY AND POP CULTURE. EACH ISSUE CURATES THE AGENCY'S BEST WORK, EXPERIMENTS, AND CULTURAL REFLECTIONS INTO A MODERN MAGAZINE FORMAT DESIGNED TO SPARK CONVERSATION, MAKE NOISE, AND CELEBRATE IDEAS THAT</span>{" "}
-          <span className="text-primary not-italic">POP.</span>
-        </h2>
+        {/* Large impact text - GeistMono Medium, justified */}
+        <p 
+          className="uppercase font-medium leading-[1.25] tracking-tight text-justify"
+          style={{ 
+            fontFamily: "'GeistMono', monospace",
+            fontSize: 'clamp(1rem, 3.5vw, 2.5rem)',
+            color: '#ed008c'
+          }}
+        >
+          <span className="text-white">GIGIL POPS</span> IS GIGIL'S MONTHLY EDITORIAL PUBLICATION AT THE CROSSROADS OF CREATIVITY AND POP CULTURE. EACH ISSUE CURATES THE AGENCY'S BEST WORK, EXPERIMENTS, AND CULTURAL REFLECTIONS INTO A MODERN MAGAZINE FORMAT DESIGNED TO SPARK CONVERSATION, MAKE NOISE, AND CELEBRATE IDEAS THAT POP.
+        </p>
       </div>
 
       {/* Bottom description */}

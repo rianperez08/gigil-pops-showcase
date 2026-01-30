@@ -17,7 +17,7 @@ const HeroSection = ({ onCtaClick }: HeroSectionProps) => {
         alt=""
         className="absolute inset-0 w-full h-full object-cover z-10 pointer-events-none"
         style={{
-          opacity: 0.25,
+          opacity: 1,
           mixBlendMode: 'screen',
         }}
       />

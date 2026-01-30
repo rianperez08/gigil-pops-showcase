@@ -23,7 +23,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const [displayPage, setDisplayPage] = useState(currentPage);
   const [mobileIndicator, setMobileIndicator] = useState(false);
   
-  const hitAreaRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const touchStartX = useRef(0);
   const mobileIndicatorTimeout = useRef<NodeJS.Timeout>();
@@ -62,14 +62,14 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
     }, 400);
   }, [currentPage, isAnimating]);
 
-  const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+  const handleClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
     if (isAnimating) return;
     
-    const hitArea = hitAreaRef.current;
+    const section = sectionRef.current;
     const image = imageRef.current;
-    if (!hitArea || !image) return;
+    if (!section || !image) return;
     
-    const hitRect = hitArea.getBoundingClientRect();
+    const sectionRect = section.getBoundingClientRect();
     const imageRect = image.getBoundingClientRect();
     const clickX = e.clientX;
     const clickY = e.clientY;
@@ -93,27 +93,24 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       }
     }
     
-    // Determine left or right half of hit area for navigation
-    const hitMidX = hitRect.left + hitRect.width / 2;
+    // Determine left or right half of section for navigation
+    const sectionMidX = sectionRect.left + sectionRect.width / 2;
     
-    if (clickX < hitMidX) {
+    if (clickX < sectionMidX) {
       navigateTo("prev");
     } else {
       navigateTo("next");
     }
   }, [currentPage, isAnimating, navigateTo, onOpenLightbox]);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const hitArea = hitAreaRef.current;
-    if (!hitArea) return;
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    const section = sectionRef.current;
+    if (!section) return;
     
-    const rect = hitArea.getBoundingClientRect();
+    const rect = section.getBoundingClientRect();
     
-    // Clamp cursor position to hit area
-    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
-    const y = Math.max(0, Math.min(e.clientY - rect.top, rect.height));
-    
-    setCursorPos({ x, y });
+    // Calculate cursor position relative to viewport
+    setCursorPos({ x: e.clientX, y: e.clientY });
   }, []);
 
   const handleMouseEnter = useCallback(() => {
@@ -155,54 +152,49 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
 
   return (
     <section 
+      ref={sectionRef}
       id="carousel"
-      className="relative min-h-screen w-full bg-primary flex items-center justify-center py-16 md:py-24"
+      className="relative min-h-screen w-full bg-primary flex items-center justify-center py-16 md:py-24 cursor-pointer"
+      onClick={handleClick}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
-      {/* Hit area for click navigation */}
-      <div
-        ref={hitAreaRef}
-        className="relative w-full max-w-[1200px] min-h-[60vh] flex items-center justify-center cursor-pointer"
-        onClick={handleClick}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        {/* Cursor indicator - desktop only */}
-        {showCursor && (
-          <div
-            className="cursor-indicator hidden md:block"
-            style={{
-              left: cursorPos.x,
-              top: cursorPos.y,
-              transform: 'translate(-50%, -50%)',
-              position: 'absolute',
-              opacity: showCursor ? 1 : 0,
-            }}
-          >
-            {displayPage + 1} / {pages.length}
-          </div>
-        )}
-        
-        {/* Mobile indicator */}
-        {mobileIndicator && (
-          <div className="md:hidden absolute top-4 right-4 bg-primary-foreground/90 text-primary font-bold text-sm px-3 py-1.5 rounded-full z-20 animate-fade-in">
-            {displayPage + 1} / {pages.length}
-          </div>
-        )}
-        
-        {/* Spread container */}
-        <div className="spread-container">
-          <div className="relative overflow-hidden">
-            <img
-              ref={imageRef}
-              src={pages[currentPage]}
-              alt={`Page ${currentPage + 1}`}
-              className={`w-full h-auto object-contain ${animationClass}`}
-              draggable={false}
-            />
-          </div>
+      {/* Cursor indicator - desktop only, fixed position */}
+      {showCursor && (
+        <div
+          className="hidden md:block fixed pointer-events-none text-primary-foreground font-bold text-sm px-3 py-1.5 rounded-full z-50"
+          style={{
+            left: cursorPos.x,
+            top: cursorPos.y,
+            transform: 'translate(-50%, -50%)',
+            background: 'hsl(333 100% 47% / 0.9)',
+            backdropFilter: 'blur(4px)',
+          }}
+        >
+          {displayPage + 1} / {pages.length}
+        </div>
+      )}
+      
+      {/* Mobile indicator */}
+      {mobileIndicator && (
+        <div className="md:hidden absolute top-4 right-4 bg-primary-foreground/90 text-primary font-bold text-sm px-3 py-1.5 rounded-full z-20 animate-fade-in">
+          {displayPage + 1} / {pages.length}
+        </div>
+      )}
+      
+      {/* Spread container */}
+      <div className="spread-container">
+        <div className="relative overflow-hidden">
+          <img
+            ref={imageRef}
+            src={pages[currentPage]}
+            alt={`Page ${currentPage + 1}`}
+            className={`w-full h-auto object-contain ${animationClass}`}
+            draggable={false}
+          />
         </div>
       </div>
     </section>
