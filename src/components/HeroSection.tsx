@@ -1,5 +1,5 @@
 import transparentOverlay from "@/assets/transparent-overlay.gif";
-import pg1 from "@/assets/pages/pg1.png";
+import janCover from "@/assets/jan-cover.png";
 
 interface HeroSectionProps {
   onCtaClick: () => void;
@@ -7,30 +7,32 @@ interface HeroSectionProps {
 
 const HeroSection = ({ onCtaClick }: HeroSectionProps) => {
   return (
-    <section className="relative min-h-screen w-full bg-primary flex flex-col items-center justify-center overflow-hidden">
-      {/* Animated GIF overlay */}
-      <div 
-        className="absolute inset-0 pointer-events-none z-0"
+    <section className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden">
+      {/* Base magenta background */}
+      <div className="absolute inset-0 bg-primary z-0" />
+      
+      {/* Animated GIF overlay - ON TOP of magenta, higher opacity for visibility */}
+      <img
+        src={transparentOverlay}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover z-10 pointer-events-none"
         style={{
-          backgroundImage: `url(${transparentOverlay})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          opacity: 0.15,
-          mixBlendMode: 'overlay',
+          opacity: 0.25,
+          mixBlendMode: 'screen',
         }}
       />
       
       {/* Hero Cover Image - centered */}
-      <div className="relative z-10 flex-1 flex items-center justify-center w-full px-4 py-24 md:py-32">
+      <div className="relative z-20 flex-1 flex items-center justify-center w-full px-4 py-24 md:py-32">
         <img 
-          src={pg1} 
+          src={janCover} 
           alt="January Issue Cover"
-          className="max-h-[60vh] md:max-h-[70vh] w-auto object-contain shadow-2xl animate-scale-in"
+          className="max-h-[60vh] md:max-h-[75vh] w-auto object-contain shadow-2xl animate-scale-in"
         />
       </div>
       
       {/* CTA Button */}
-      <div className="relative z-10 pb-12 md:pb-16">
+      <div className="relative z-20 pb-12 md:pb-16">
         <button
           onClick={onCtaClick}
           className="cta-underline text-sm md:text-base px-4 py-2"
