@@ -7,7 +7,7 @@ import pg5 from "@/assets/pages/pg5.png";
 import pg6 from "@/assets/pages/pg6.png";
 import pg7 from "@/assets/pages/pg7.png";
 import pg8 from "@/assets/pages/pg8.png";
-
+import transparentOverlay from "@/assets/transparent-overlay.gif";
 const pages = [pg1, pg2, pg3, pg4, pg5, pg6, pg7, pg8];
 
 interface CarouselSectionProps {
@@ -156,6 +156,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       id="carousel"
       className="relative min-h-screen w-full bg-primary flex items-center justify-center py-16 md:py-24 cursor-pointer"
       onClick={handleClick}
+      style={{background:'#000'}}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -163,6 +164,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       onTouchEnd={handleTouchEnd}
     >
       {/* Cursor indicator - desktop only, fixed position */}
+      
       {showCursor && (
         <div
           className="hidden md:block fixed pointer-events-none text-primary-foreground font-bold text-sm px-3 py-1.5 rounded-full z-50"
@@ -170,7 +172,6 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
             left: cursorPos.x,
             top: cursorPos.y,
             transform: 'translate(-50%, -50%)',
-            background: 'hsl(333 100% 47% / 0.9)',
             backdropFilter: 'blur(4px)',
           }}
         >
@@ -187,7 +188,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       
       {/* Spread container */}
       <div className="spread-container">
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden ">
           <img
             ref={imageRef}
             src={pages[currentPage]}
@@ -197,6 +198,17 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
           />
         </div>
       </div>
+
+
+      <img
+        src={transparentOverlay}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover z-10 pointer-events-none"
+        style={{
+          opacity: 1,
+          mixBlendMode: 'screen',
+        }}
+      />
     </section>
   );
 };
