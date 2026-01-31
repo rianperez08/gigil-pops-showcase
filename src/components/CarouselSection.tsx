@@ -8,8 +8,17 @@ import pg6 from "@/assets/pages/pg6.png";
 import pg7 from "@/assets/pages/pg7.png";
 import pg8 from "@/assets/pages/pg8.png";
 import pg9 from "@/assets/pages/pg9.png";
+// pg10 is missing - awaiting upload
+import pg11 from "@/assets/pages/pg11.png";
+import pg12 from "@/assets/pages/pg12.png";
+import pg13 from "@/assets/pages/pg13.png";
+import pg14 from "@/assets/pages/pg14.png";
+import pg15 from "@/assets/pages/pg15.png";
+import pg16 from "@/assets/pages/pg16.png";
+import pg17 from "@/assets/pages/pg17.png";
 
-const pages = [pg1, pg2, pg3, pg4, pg5, pg6, pg7, pg8, pg9];
+// Using pg9 as placeholder for pg10 until it's uploaded
+const pages = [pg1, pg2, pg3, pg4, pg5, pg6, pg7, pg8, pg9, pg9, pg11, pg12, pg13, pg14, pg15, pg16, pg17];
 
 interface CarouselSectionProps {
   onOpenLightbox: (pageIndex: number) => void;
@@ -17,19 +26,19 @@ interface CarouselSectionProps {
 
 const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const [currentPage, setCurrentPage] = useState(0);
-  const [nextPage, setNextPage] = useState<number | null>(null);
-  const [direction, setDirection] = useState<"left" | "right" | null>(null);
+  const [translateX, setTranslateX] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [showCursor, setShowCursor] = useState(false);
   const [mobileIndicator, setMobileIndicator] = useState(false);
+  const [displayPage, setDisplayPage] = useState(0);
   
   const sectionRef = useRef<HTMLElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const touchStartX = useRef(0);
   const mobileIndicatorTimeout = useRef<NodeJS.Timeout>();
 
-  // Preload all images
+  // Preload all images on mount
   useEffect(() => {
     pages.forEach((src) => {
       const img = new Image();
@@ -44,17 +53,20 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       ? (currentPage + 1) % pages.length 
       : (currentPage - 1 + pages.length) % pages.length;
     
-    setNextPage(newPage);
-    setDirection(dir === "next" ? "left" : "right");
+    // Update display immediately for indicator
+    setDisplayPage(newPage);
     setIsAnimating(true);
     
-    // After animation completes, update current page
+    // Animate the slide
+    setTranslateX(dir === "next" ? -100 : 100);
+    
+    // After animation, update page and reset position instantly
     setTimeout(() => {
       setCurrentPage(newPage);
-      setNextPage(null);
-      setDirection(null);
+      // Disable transition temporarily to reset position without animation
+      setTranslateX(0);
       setIsAnimating(false);
-    }, 400);
+    }, 350);
   }, [currentPage, isAnimating]);
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
@@ -77,7 +89,6 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       clickY <= imageRect.bottom;
     
     if (isWithinImage) {
-      // Calculate relative position within image
       const relativeX = (clickX - imageRect.left) / imageRect.width;
       
       // Center band check (30% - 70%)
@@ -123,7 +134,6 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
     const touchEndX = e.changedTouches[0].clientX;
     const diff = touchStartX.current - touchEndX;
     
-    // Swipe threshold
     if (Math.abs(diff) > 50) {
       if (diff > 0) {
         navigateTo("next");
@@ -132,14 +142,14 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       }
     }
     
-    // Hide mobile indicator after delay
     mobileIndicatorTimeout.current = setTimeout(() => {
       setMobileIndicator(false);
     }, 1000);
   }, [navigateTo]);
 
-  // Calculate display page for indicator (shows target during animation)
-  const displayPage = nextPage !== null ? nextPage : currentPage;
+  // Get prev and next page indices for rendering
+  const prevPage = (currentPage - 1 + pages.length) % pages.length;
+  const nextPage = (currentPage + 1) % pages.length;
 
   return (
     <section 
@@ -154,7 +164,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Cursor indicator - desktop only, fixed position */}
+      {/* Cursor indicator - desktop only */}
       {showCursor && (
         <div
           className="hidden md:block fixed pointer-events-none text-primary-foreground font-bold text-sm px-3 py-1.5 rounded-full z-50"
@@ -176,49 +186,45 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
         </div>
       )}
       
-      {/* Spread container with swipe animation */}
-      <div className="spread-container relative z-10">
-        <div className="relative overflow-hidden">
-          {/* Container for both images during animation */}
-          <div 
-            className="flex transition-transform duration-400 ease-out"
-            style={{
-              transform: direction === "left" 
-                ? 'translateX(-50%)' 
-                : direction === "right" 
-                  ? 'translateX(0%)' 
-                  : 'translateX(0%)',
-              width: nextPage !== null ? '200%' : '100%',
-            }}
-          >
-            {/* Previous/Current image when swiping right */}
-            {direction === "right" && nextPage !== null && (
-              <img
-                src={pages[nextPage]}
-                alt={`Page ${nextPage + 1}`}
-                className="w-1/2 h-auto object-contain flex-shrink-0"
-                draggable={false}
-              />
-            )}
-            
-            {/* Current image */}
+      {/* Spread container with 3-image carousel */}
+      <div className="spread-container relative z-10 overflow-hidden">
+        <div 
+          className="flex"
+          style={{
+            transform: `translateX(calc(-100% + ${translateX}%))`,
+            transition: isAnimating ? 'transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none',
+            width: '300%',
+          }}
+        >
+          {/* Previous page */}
+          <div className="w-1/3 flex-shrink-0">
+            <img
+              src={pages[prevPage]}
+              alt={`Page ${prevPage + 1}`}
+              className="w-full h-auto object-contain"
+              draggable={false}
+            />
+          </div>
+          
+          {/* Current page */}
+          <div className="w-1/3 flex-shrink-0">
             <img
               ref={imageRef}
               src={pages[currentPage]}
               alt={`Page ${currentPage + 1}`}
-              className={`h-auto object-contain flex-shrink-0 ${nextPage !== null ? 'w-1/2' : 'w-full'}`}
+              className="w-full h-auto object-contain"
               draggable={false}
             />
-            
-            {/* Next image when swiping left */}
-            {direction === "left" && nextPage !== null && (
-              <img
-                src={pages[nextPage]}
-                alt={`Page ${nextPage + 1}`}
-                className="w-1/2 h-auto object-contain flex-shrink-0"
-                draggable={false}
-              />
-            )}
+          </div>
+          
+          {/* Next page */}
+          <div className="w-1/3 flex-shrink-0">
+            <img
+              src={pages[nextPage]}
+              alt={`Page ${nextPage + 1}`}
+              className="w-full h-auto object-contain"
+              draggable={false}
+            />
           </div>
         </div>
       </div>
