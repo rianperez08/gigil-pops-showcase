@@ -187,7 +187,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       )}
       
       {/* Spread container */}
-      <div className="spread-container">
+      <div className="spread-container relative z-10">
         <div className="relative overflow-hidden ">
           <img
             ref={imageRef}
@@ -200,15 +200,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       </div>
 
 
-      <img
-        src={transparentOverlay}
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover z-10 pointer-events-none"
-        style={{
-          opacity: 1,
-          mixBlendMode: 'screen',
-        }}
-      />
+      
     </section>
   );
 };
