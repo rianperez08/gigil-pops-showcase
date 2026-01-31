@@ -9,6 +9,7 @@ import pg6 from "@/assets/pages/pg6.png";
 import pg7 from "@/assets/pages/pg7.png";
 import pg8 from "@/assets/pages/pg8.png";
 import pg9 from "@/assets/pages/pg9.png";
+import pg10 from "@/assets/pages/pg10.png";
 import pg11 from "@/assets/pages/pg11.png";
 import pg12 from "@/assets/pages/pg12.png";
 import pg13 from "@/assets/pages/pg13.png";
@@ -17,8 +18,7 @@ import pg15 from "@/assets/pages/pg15.png";
 import pg16 from "@/assets/pages/pg16.png";
 import pg17 from "@/assets/pages/pg17.png";
 
-// Using pg9 as placeholder for pg10 until it's uploaded
-const pages = [pg1, pg2, pg3, pg4, pg5, pg6, pg7, pg8, pg9, pg9, pg11, pg12, pg13, pg14, pg15, pg16, pg17];
+const pages = [pg1, pg2, pg3, pg4, pg5, pg6, pg7, pg8, pg9, pg10, pg11, pg12, pg13, pg14, pg15, pg16, pg17];
 
 interface LightboxProps {
   isOpen: boolean;
@@ -133,7 +133,8 @@ const Lightbox = ({ isOpen, pageIndex, onClose }: LightboxProps) => {
   return (
     <div
       ref={containerRef}
-      className="lightbox-backdrop animate-fade-in"
+      className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 animate-fade-in"
+      style={{ backdropFilter: 'blur(8px)' }}
       onClick={handleBackdropClick}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
