@@ -7,8 +7,9 @@ import pg5 from "@/assets/pages/pg5.png";
 import pg6 from "@/assets/pages/pg6.png";
 import pg7 from "@/assets/pages/pg7.png";
 import pg8 from "@/assets/pages/pg8.png";
-import transparentOverlay from "@/assets/transparent-overlay.gif";
-const pages = [pg1, pg2, pg3, pg4, pg5, pg6, pg7, pg8];
+import pg9 from "@/assets/pages/pg9.png";
+
+const pages = [pg1, pg2, pg3, pg4, pg5, pg6, pg7, pg8, pg9];
 
 interface CarouselSectionProps {
   onOpenLightbox: (pageIndex: number) => void;
@@ -16,11 +17,11 @@ interface CarouselSectionProps {
 
 const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const [currentPage, setCurrentPage] = useState(0);
-  const [animationClass, setAnimationClass] = useState("");
+  const [nextPage, setNextPage] = useState<number | null>(null);
+  const [direction, setDirection] = useState<"left" | "right" | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [showCursor, setShowCursor] = useState(false);
-  const [displayPage, setDisplayPage] = useState(currentPage);
   const [mobileIndicator, setMobileIndicator] = useState(false);
   
   const sectionRef = useRef<HTMLElement>(null);
@@ -36,28 +37,22 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
     });
   }, []);
 
-  const navigateTo = useCallback((direction: "prev" | "next") => {
+  const navigateTo = useCallback((dir: "prev" | "next") => {
     if (isAnimating) return;
     
-    setIsAnimating(true);
-    
-    // Calculate new page immediately
-    const newPage = direction === "next" 
+    const newPage = dir === "next" 
       ? (currentPage + 1) % pages.length 
       : (currentPage - 1 + pages.length) % pages.length;
     
-    // Update displayPage immediately for indicator
-    setDisplayPage(newPage);
+    setNextPage(newPage);
+    setDirection(dir === "next" ? "left" : "right");
+    setIsAnimating(true);
     
-    // Set animation class
-    setAnimationClass(direction === "next" ? "page-enter-right" : "page-enter-left");
-    
-    // Update actual page state
-    setCurrentPage(newPage);
-    
-    // Reset animation state after animation completes
+    // After animation completes, update current page
     setTimeout(() => {
-      setAnimationClass("");
+      setCurrentPage(newPage);
+      setNextPage(null);
+      setDirection(null);
       setIsAnimating(false);
     }, 400);
   }, [currentPage, isAnimating]);
@@ -87,7 +82,6 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       
       // Center band check (30% - 70%)
       if (relativeX >= 0.3 && relativeX <= 0.7) {
-        // Open lightbox for center click
         onOpenLightbox(currentPage);
         return;
       }
@@ -104,12 +98,6 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   }, [currentPage, isAnimating, navigateTo, onOpenLightbox]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    const section = sectionRef.current;
-    if (!section) return;
-    
-    const rect = section.getBoundingClientRect();
-    
-    // Calculate cursor position relative to viewport
     setCursorPos({ x: e.clientX, y: e.clientY });
   }, []);
 
@@ -150,6 +138,9 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
     }, 1000);
   }, [navigateTo]);
 
+  // Calculate display page for indicator (shows target during animation)
+  const displayPage = nextPage !== null ? nextPage : currentPage;
+
   return (
     <section 
       ref={sectionRef}
@@ -164,7 +155,6 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       onTouchEnd={handleTouchEnd}
     >
       {/* Cursor indicator - desktop only, fixed position */}
-      
       {showCursor && (
         <div
           className="hidden md:block fixed pointer-events-none text-primary-foreground font-bold text-sm px-3 py-1.5 rounded-full z-50"
@@ -186,21 +176,52 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
         </div>
       )}
       
-      {/* Spread container */}
+      {/* Spread container with swipe animation */}
       <div className="spread-container relative z-10">
-        <div className="relative overflow-hidden ">
-          <img
-            ref={imageRef}
-            src={pages[currentPage]}
-            alt={`Page ${currentPage + 1}`}
-            className={`w-full h-auto object-contain ${animationClass}`}
-            draggable={false}
-          />
+        <div className="relative overflow-hidden">
+          {/* Container for both images during animation */}
+          <div 
+            className="flex transition-transform duration-400 ease-out"
+            style={{
+              transform: direction === "left" 
+                ? 'translateX(-50%)' 
+                : direction === "right" 
+                  ? 'translateX(0%)' 
+                  : 'translateX(0%)',
+              width: nextPage !== null ? '200%' : '100%',
+            }}
+          >
+            {/* Previous/Current image when swiping right */}
+            {direction === "right" && nextPage !== null && (
+              <img
+                src={pages[nextPage]}
+                alt={`Page ${nextPage + 1}`}
+                className="w-1/2 h-auto object-contain flex-shrink-0"
+                draggable={false}
+              />
+            )}
+            
+            {/* Current image */}
+            <img
+              ref={imageRef}
+              src={pages[currentPage]}
+              alt={`Page ${currentPage + 1}`}
+              className={`h-auto object-contain flex-shrink-0 ${nextPage !== null ? 'w-1/2' : 'w-full'}`}
+              draggable={false}
+            />
+            
+            {/* Next image when swiping left */}
+            {direction === "left" && nextPage !== null && (
+              <img
+                src={pages[nextPage]}
+                alt={`Page ${nextPage + 1}`}
+                className="w-1/2 h-auto object-contain flex-shrink-0"
+                draggable={false}
+              />
+            )}
+          </div>
         </div>
       </div>
-
-
-      
     </section>
   );
 };
