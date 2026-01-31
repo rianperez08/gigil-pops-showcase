@@ -8,8 +8,9 @@ import pg5 from "@/assets/pages/pg5.png";
 import pg6 from "@/assets/pages/pg6.png";
 import pg7 from "@/assets/pages/pg7.png";
 import pg8 from "@/assets/pages/pg8.png";
+import pg9 from "@/assets/pages/pg9.png";
 
-const pages = [pg1, pg2, pg3, pg4, pg5, pg6, pg7, pg8];
+const pages = [pg1, pg2, pg3, pg4, pg5, pg6, pg7, pg8, pg9];
 
 interface LightboxProps {
   isOpen: boolean;
