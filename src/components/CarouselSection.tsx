@@ -25,6 +25,7 @@ interface CarouselSectionProps {
 
 const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [nextPage, setNextPage] = useState<number | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
@@ -35,6 +36,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const imageRef = useRef<HTMLImageElement>(null);
   const touchStartX = useRef(0);
   const mobileIndicatorTimeout = useRef<NodeJS.Timeout>();
+  const animationDuration = 400;
 
   // Preload all images on mount
   useEffect(() => {
@@ -46,27 +48,21 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
 
   const navigateTo = useCallback((direction: "prev" | "next") => {
     if (isAnimating) return;
-    
+    const targetPage = direction === "next"
+      ? (currentPage + 1) % pages.length
+      : (currentPage - 1 + pages.length) % pages.length;
+
     setIsAnimating(true);
     setSlideDirection(direction === "next" ? "left" : "right");
-    
-    // Update page after a brief delay to show animation start
+    setNextPage(targetPage);
+
     setTimeout(() => {
-      setCurrentPage(prev => {
-        if (direction === "next") {
-          return (prev + 1) % pages.length;
-        } else {
-          return (prev - 1 + pages.length) % pages.length;
-        }
-      });
-      
-      // Reset animation state
-      setTimeout(() => {
-        setSlideDirection(null);
-        setIsAnimating(false);
-      }, 50);
-    }, 200);
-  }, [isAnimating]);
+      setCurrentPage(targetPage);
+      setNextPage(null);
+      setSlideDirection(null);
+      setIsAnimating(false);
+    }, animationDuration);
+  }, [animationDuration, currentPage, isAnimating]);
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
     if (isAnimating) return;
@@ -147,9 +143,14 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   }, [navigateTo]);
 
   // Calculate animation class
-  const getAnimationClass = () => {
+  const getExitAnimationClass = () => {
     if (!slideDirection) return "";
-    return slideDirection === "left" ? "animate-slide-out-left" : "animate-slide-out-right";
+    return slideDirection === "left" ? "page-exit-left" : "page-exit-right";
+  };
+
+  const getEnterAnimationClass = () => {
+    if (!slideDirection) return "";
+    return slideDirection === "left" ? "page-enter-right" : "page-enter-left";
   };
 
   return (
@@ -196,21 +197,29 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
         }}
       >
         <img
-          ref={imageRef}
           src={pages[currentPage]}
-          alt={`Page ${currentPage + 1}`}
-          className={`w-full h-auto object-contain transition-opacity duration-200 ${getAnimationClass()}`}
-          style={{
-            opacity: slideDirection ? 0.5 : 1,
-            transform: slideDirection === "left" 
-              ? 'translateX(-20px)' 
-              : slideDirection === "right" 
-                ? 'translateX(20px)' 
-                : 'translateX(0)',
-            transition: 'transform 200ms ease-out, opacity 200ms ease-out',
-          }}
+          alt=""
+          aria-hidden="true"
+          className="w-full h-auto opacity-0 pointer-events-none select-none"
           draggable={false}
         />
+        <div className="absolute inset-0">
+          <img
+            ref={imageRef}
+            src={pages[currentPage]}
+            alt={`Page ${currentPage + 1}`}
+            className={`absolute inset-0 w-full h-full object-contain ${getExitAnimationClass()}`}
+            draggable={false}
+          />
+          {nextPage !== null && (
+            <img
+              src={pages[nextPage]}
+              alt={`Page ${nextPage + 1}`}
+              className={`absolute inset-0 w-full h-full object-contain ${getEnterAnimationClass()}`}
+              draggable={false}
+            />
+          )}
+        </div>
       </div>
     </section>
   );
