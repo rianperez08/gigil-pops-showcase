@@ -19,11 +19,23 @@ import pg16 from "@/assets/pages/pg16.png";
 import pg17 from "@/assets/pages/pg17.png";
 
 // Compressed images (for Carousel)
+import pg1Compressed from "@/assets/pages-compressed/pg1.png";
 import pg2Compressed from "@/assets/pages-compressed/pg2.png";
 import pg3Compressed from "@/assets/pages-compressed/pg3.png";
 import pg4Compressed from "@/assets/pages-compressed/pg4.png";
 import pg5Compressed from "@/assets/pages-compressed/pg5.png";
 import pg6Compressed from "@/assets/pages-compressed/pg6.png";
+import pg7Compressed from "@/assets/pages-compressed/pg7.png";
+import pg8Compressed from "@/assets/pages-compressed/pg8.png";
+import pg9Compressed from "@/assets/pages-compressed/pg9.png";
+import pg10Compressed from "@/assets/pages-compressed/pg10.png";
+import pg11Compressed from "@/assets/pages-compressed/pg11.png";
+import pg12Compressed from "@/assets/pages-compressed/pg12.png";
+import pg13Compressed from "@/assets/pages-compressed/pg13.png";
+import pg14Compressed from "@/assets/pages-compressed/pg14.png";
+import pg15Compressed from "@/assets/pages-compressed/pg15.png";
+import pg16Compressed from "@/assets/pages-compressed/pg16.png";
+import pg17Compressed from "@/assets/pages-compressed/pg17.png";
 
 const carouselPages = [
   { src: pg1, full: pg1 },
@@ -32,17 +44,17 @@ const carouselPages = [
   { src: pg4Compressed, full: pg4 },
   { src: pg5Compressed, full: pg5 },
   { src: pg6Compressed, full: pg6 },
-  { src: pg7, full: pg7 },
-  { src: pg8, full: pg8 },
-  { src: pg9, full: pg9 },
-  { src: pg10, full: pg10 },
-  { src: pg11, full: pg11 },
-  { src: pg12, full: pg12 },
-  { src: pg13, full: pg13 },
-  { src: pg14, full: pg14 },
-  { src: pg15, full: pg15 },
-  { src: pg16, full: pg16 },
-  { src: pg17, full: pg17 },
+  { src: pg7Compressed, full: pg7 },
+  { src: pg8Compressed, full: pg8 },
+  { src: pg9Compressed, full: pg9 },
+  { src: pg10Compressed, full: pg10 },
+  { src: pg11Compressed, full: pg11 },
+  { src: pg12Compressed, full: pg12 },
+  { src: pg13Compressed, full: pg13 },
+  { src: pg14Compressed, full: pg14 },
+  { src: pg15Compressed, full: pg15 },
+  { src: pg16Compressed, full: pg16 },
+  { src: pg17Compressed, full: pg17 },
 ];
 
 interface CarouselSectionProps {
