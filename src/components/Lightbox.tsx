@@ -224,11 +224,15 @@ const Lightbox = ({ isOpen, pageIndex, onNavigate, onClose }: LightboxProps) => 
       </div>
 
       <div
-        className="hidden sm:hidden fixed bottom-4 left-4 right-4 z-50 flex-col items-center gap-2 text-white text-xs tracking-[0.2em] uppercase [@media(orientation:portrait)]:flex [@media(orientation:portrait)]:justify-center"
+        className="hidden sm:hidden fixed bottom-4 left-4 right-4 z-50 flex-col items-center gap-2 text-white text-[0.375rem] tracking-[0.2em] uppercase [@media(orientation:portrait)]:flex [@media(orientation:portrait)]:justify-center"
         aria-hidden="true"
       >
         <Smartphone className="h-6 w-6 rotate-90 text-white/80" />
-        <span className="text-center text-white/80">TURN ON AUTO-ROTATE ON YOUR PHONE</span>
+        <span className="text-center text-white/80">
+          TURN ON AUTO-ROTATE ON YOUR PHONE
+          <br />
+          AND VIEW IT ON LANDSCAPE:
+        </span>
       </div>
 
       {/* Image */}
