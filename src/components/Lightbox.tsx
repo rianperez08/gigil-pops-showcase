@@ -1,11 +1,24 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { X, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import pg1 from "@/assets/pages/pg1.png";
+import pg2 from "@/assets/pages/pg2.png";
+import pg3 from "@/assets/pages/pg3.png";
+import pg4 from "@/assets/pages/pg4.png";
+import pg5 from "@/assets/pages/pg5.png";
+import pg6 from "@/assets/pages/pg6.png";
+import pg7 from "@/assets/pages/pg7.png";
+import pg8 from "@/assets/pages/pg8.png";
+import pg9 from "@/assets/pages/pg9.png";
+import pg10 from "@/assets/pages/pg10.png";
+import pg11 from "@/assets/pages/pg11.png";
+import pg12 from "@/assets/pages/pg12.png";
+import pg13 from "@/assets/pages/pg13.png";
+import pg14 from "@/assets/pages/pg14.png";
+import pg15 from "@/assets/pages/pg15.png";
+import pg16 from "@/assets/pages/pg16.png";
+import pg17 from "@/assets/pages/pg17.png";
 
-const sirvBaseUrl = "https://gigilpops.sirv.com/iloveimg-compressed";
-const pages = Array.from({ length: 17 }, (_, index) => {
-  const pageNumber = index + 1;
-  return `${sirvBaseUrl}/pg${pageNumber}.png`;
-});
+const pages = [pg1, pg2, pg3, pg4, pg5, pg6, pg7, pg8, pg9, pg10, pg11, pg12, pg13, pg14, pg15, pg16, pg17];
 
 interface LightboxProps {
   isOpen: boolean;
@@ -197,9 +210,9 @@ const Lightbox = ({ isOpen, pageIndex, onNavigate, onClose }: LightboxProps) => 
         onTouchEnd={handleTouchEnd}
       >
         <img
-          className="Sirv max-w-full max-h-[90vh] object-contain select-none"
-          data-src={pages[pageIndex]}
+          src={pages[pageIndex]}
           alt={`Page ${pageIndex + 1} - Zoomed`}
+          className="max-w-full max-h-[90vh] object-contain select-none"
           style={{
             transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px)`,
             transition: isDragging ? "none" : "transform 0.2s ease-out",
