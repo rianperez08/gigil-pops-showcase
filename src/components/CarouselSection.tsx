@@ -1,10 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+// Full resolution images (for Lightbox)
 import pg1 from "@/assets/pages/pg1.png";
-import pg2 from "@/assets/pages/pg2.png";
-import pg3 from "@/assets/pages/pg3.png";
-import pg4 from "@/assets/pages/pg4.png";
-import pg5 from "@/assets/pages/pg5.png";
-import pg6 from "@/assets/pages/pg6.png";
 import pg7 from "@/assets/pages/pg7.png";
 import pg8 from "@/assets/pages/pg8.png";
 import pg9 from "@/assets/pages/pg9.png";
@@ -17,7 +13,33 @@ import pg15 from "@/assets/pages/pg15.png";
 import pg16 from "@/assets/pages/pg16.png";
 import pg17 from "@/assets/pages/pg17.png";
 
-const pages = [pg1, pg2, pg3, pg4, pg5, pg6, pg7, pg8, pg9, pg10, pg11, pg12, pg13, pg14, pg15, pg16, pg17];
+// Compressed images (for Carousel)
+import pg2Compressed from "@/assets/pages-compressed/pg2.png";
+import pg3Compressed from "@/assets/pages-compressed/pg3.png";
+import pg4Compressed from "@/assets/pages-compressed/pg4.png";
+import pg5Compressed from "@/assets/pages-compressed/pg5.png";
+import pg6Compressed from "@/assets/pages-compressed/pg6.png";
+
+// Carousel uses compressed where available, falls back to full-res
+const carouselPages = [
+  pg1, // No compressed version yet
+  pg2Compressed,
+  pg3Compressed,
+  pg4Compressed,
+  pg5Compressed,
+  pg6Compressed,
+  pg7, // No compressed version yet
+  pg8,
+  pg9,
+  pg10,
+  pg11,
+  pg12,
+  pg13,
+  pg14,
+  pg15,
+  pg16,
+  pg17,
+];
 
 interface CarouselSectionProps {
   onOpenLightbox: (pageIndex: number) => void;
@@ -38,9 +60,9 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const mobileIndicatorTimeout = useRef<NodeJS.Timeout>();
   const animationDuration = 400;
 
-  // Preload all images on mount
+  // Preload carousel images on mount (compressed versions for speed)
   useEffect(() => {
-    pages.forEach((src) => {
+    carouselPages.forEach((src) => {
       const img = new Image();
       img.src = src;
     });
@@ -49,8 +71,8 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const navigateTo = useCallback((direction: "prev" | "next") => {
     if (isAnimating) return;
     const targetPage = direction === "next"
-      ? (currentPage + 1) % pages.length
-      : (currentPage - 1 + pages.length) % pages.length;
+      ? (currentPage + 1) % carouselPages.length
+      : (currentPage - 1 + carouselPages.length) % carouselPages.length;
 
     setIsAnimating(true);
     setSlideDirection(direction === "next" ? "left" : "right");
@@ -177,14 +199,14 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
             backdropFilter: 'blur(4px)',
           }}
         >
-          {currentPage + 1} / {pages.length}
+          {currentPage + 1} / {carouselPages.length}
         </div>
       )}
       
       {/* Mobile indicator */}
       {mobileIndicator && (
         <div className="md:hidden absolute top-4 right-4 bg-white/90 text-black font-bold text-sm px-3 py-1.5 rounded-full z-20">
-          {currentPage + 1} / {pages.length}
+          {currentPage + 1} / {carouselPages.length}
         </div>
       )}
       
@@ -197,7 +219,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
         }}
       >
         <img
-          src={pages[currentPage]}
+          src={carouselPages[currentPage]}
           alt=""
           aria-hidden="true"
           className="w-full h-auto opacity-0 pointer-events-none select-none"
@@ -206,14 +228,14 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
         <div className="absolute inset-0">
           <img
             ref={imageRef}
-            src={pages[currentPage]}
+            src={carouselPages[currentPage]}
             alt={`Page ${currentPage + 1}`}
             className={`absolute inset-0 w-full h-full object-contain ${getExitAnimationClass()}`}
             draggable={false}
           />
           {nextPage !== null && (
             <img
-              src={pages[nextPage]}
+              src={carouselPages[nextPage]}
               alt={`Page ${nextPage + 1}`}
               className={`absolute inset-0 w-full h-full object-contain ${getEnterAnimationClass()}`}
               draggable={false}

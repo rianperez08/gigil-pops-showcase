@@ -1,5 +1,5 @@
 import transparentOverlay from "@/assets/transparent-overlay.gif";
-import janCover from "@/assets/jan-cover.png";
+import janCover from "@/assets/jan-cover.jpeg";
 
 interface HeroSectionProps {
   onCtaClick: () => void;
