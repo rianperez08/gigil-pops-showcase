@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 const sirvBaseUrl = "https://gigilpops.sirv.com/iloveimg-compressed";
 
@@ -26,6 +26,11 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const touchStartY = useRef(0);
   const mobileIndicatorTimeout = useRef<NodeJS.Timeout>();
   const animationDuration = 400;
+
+  useEffect(() => {
+    const sirv = (window as typeof window & { Sirv?: { start?: () => void } }).Sirv;
+    sirv?.start?.();
+  }, [currentPage, nextPage]);
 
   const navigateTo = useCallback((direction: "prev" | "next") => {
     if (isAnimating) return;
@@ -190,6 +195,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
         }}
       >
         <img
+          key={`page-placeholder-${currentPage}`}
           className="Sirv w-full h-auto opacity-0 pointer-events-none select-none"
           data-src={carouselPages[currentPage]}
           alt=""
@@ -198,6 +204,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
         />
         <div className="absolute inset-0">
           <img
+            key={`page-current-${currentPage}`}
             ref={imageRef}
             className={`Sirv absolute inset-0 w-full h-full object-contain ${getExitAnimationClass()}`}
             data-src={carouselPages[currentPage]}
@@ -206,6 +213,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
           />
           {nextPage !== null && (
             <img
+              key={`page-next-${nextPage}`}
               className={`Sirv absolute inset-0 w-full h-full object-contain ${getEnterAnimationClass()}`}
               data-src={carouselPages[nextPage]}
               alt={`Page ${nextPage + 1}`}

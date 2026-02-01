@@ -29,6 +29,11 @@ const Lightbox = ({ isOpen, pageIndex, onNavigate, onClose }: LightboxProps) => 
     }
   }, [isOpen, pageIndex]);
 
+  useEffect(() => {
+    const sirv = (window as typeof window & { Sirv?: { start?: () => void } }).Sirv;
+    sirv?.start?.();
+  }, [isOpen, pageIndex]);
+
   // Handle Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
