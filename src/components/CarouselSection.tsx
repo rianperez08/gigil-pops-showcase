@@ -19,23 +19,23 @@ import pg16 from "@/assets/pages/pg16.png";
 import pg17 from "@/assets/pages/pg17.png";
 
 // Compressed images (for Carousel)
-import pg1Compressed from "@/assets/pages-compressed/pg1.png";
-import pg2Compressed from "@/assets/pages-compressed/pg2.png";
-import pg3Compressed from "@/assets/pages-compressed/pg3.png";
-import pg4Compressed from "@/assets/pages-compressed/pg4.png";
-import pg5Compressed from "@/assets/pages-compressed/pg5.png";
-import pg6Compressed from "@/assets/pages-compressed/pg6.png";
-import pg7Compressed from "@/assets/pages-compressed/pg7.png";
-import pg8Compressed from "@/assets/pages-compressed/pg8.png";
-import pg9Compressed from "@/assets/pages-compressed/pg9.png";
-import pg10Compressed from "@/assets/pages-compressed/pg10.png";
-import pg11Compressed from "@/assets/pages-compressed/pg11.png";
-import pg12Compressed from "@/assets/pages-compressed/pg12.png";
-import pg13Compressed from "@/assets/pages-compressed/pg13.png";
-import pg14Compressed from "@/assets/pages-compressed/pg14.png";
-import pg15Compressed from "@/assets/pages-compressed/pg15.png";
-import pg16Compressed from "@/assets/pages-compressed/pg16.png";
-import pg17Compressed from "@/assets/pages-compressed/pg17.png";
+import pg1Compressed from "@/assets/pages-compressed/pg2.jpg";
+import pg2Compressed from "@/assets/pages-compressed/pg3.jpg";
+import pg3Compressed from "@/assets/pages-compressed/pg4.jpg";
+import pg4Compressed from "@/assets/pages-compressed/pg5.jpg";
+import pg5Compressed from "@/assets/pages-compressed/pg6.jpg";
+import pg6Compressed from "@/assets/pages-compressed/pg7.jpg";
+import pg7Compressed from "@/assets/pages-compressed/pg8.jpg";
+import pg8Compressed from "@/assets/pages-compressed/pg9.jpg";
+import pg9Compressed from "@/assets/pages-compressed/pg10.jpg";
+import pg10Compressed from "@/assets/pages-compressed/pg11.jpg";
+import pg11Compressed from "@/assets/pages-compressed/pg12.jpg";
+import pg12Compressed from "@/assets/pages-compressed/pg13.jpg";
+import pg13Compressed from "@/assets/pages-compressed/pg14.jpg";
+import pg14Compressed from "@/assets/pages-compressed/pg15.jpg";
+import pg15Compressed from "@/assets/pages-compressed/pg16.jpg";
+import pg16Compressed from "@/assets/pages-compressed/pg17.jpg";
+import pg17Compressed from "@/assets/pages-compressed/pg18.jpg";
 
 const carouselPages = [
   { src: pg1, full: pg1 },
