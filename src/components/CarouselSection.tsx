@@ -75,6 +75,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const imageRef = useRef<HTMLImageElement>(null);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
+  const lastTouchTime = useRef(0);
   const mobileIndicatorTimeout = useRef<NodeJS.Timeout>();
   const loadingTimeout = useRef<NodeJS.Timeout>();
   const loadedPages = useRef<Set<number>>(new Set([0]));
@@ -157,6 +158,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   }, [animationDuration, currentPage, isAnimating]);
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    if (Date.now() - lastTouchTime.current < 500) return;
     if (isAnimating) return;
     
     const section = sectionRef.current;
@@ -239,6 +241,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
         navigateTo("prev");
       }
     }
+    lastTouchTime.current = Date.now();
     
     mobileIndicatorTimeout.current = setTimeout(() => {
       setMobileIndicator(false);
