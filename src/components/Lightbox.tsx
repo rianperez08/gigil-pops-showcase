@@ -32,6 +32,8 @@ const Lightbox = ({ isOpen, pageIndex, onNavigate, onClose }: LightboxProps) => 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
+  const swipeStart = useRef({ x: 0, y: 0 });
+  const swipeDelta = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Reset on close/open or page change
@@ -107,6 +109,10 @@ const Lightbox = ({ isOpen, pageIndex, onNavigate, onClose }: LightboxProps) => 
   }, []);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      swipeStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      swipeDelta.current = { x: 0, y: 0 };
+    }
     if (scale > 1 && e.touches.length === 1) {
       setIsDragging(true);
       dragStart.current = {
@@ -117,17 +123,37 @@ const Lightbox = ({ isOpen, pageIndex, onNavigate, onClose }: LightboxProps) => 
   }, [scale, position]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      swipeDelta.current = {
+        x: e.touches[0].clientX - swipeStart.current.x,
+        y: e.touches[0].clientY - swipeStart.current.y,
+      };
+      if (scale <= 1) {
+        e.preventDefault();
+      }
+    }
     if (isDragging && e.touches.length === 1) {
+      e.preventDefault();
       setPosition({
         x: e.touches[0].clientX - dragStart.current.x,
         y: e.touches[0].clientY - dragStart.current.y,
       });
     }
-  }, [isDragging]);
+  }, [isDragging, scale]);
 
   const handleTouchEnd = useCallback(() => {
     setIsDragging(false);
-  }, []);
+    if (scale <= 1) {
+      const { x, y } = swipeDelta.current;
+      if (Math.abs(x) > 60 && Math.abs(x) > Math.abs(y)) {
+        if (x < 0) {
+          onNavigate((pageIndex + 1) % pages.length);
+        } else {
+          onNavigate((pageIndex - 1 + pages.length) % pages.length);
+        }
+      }
+    }
+  }, [onNavigate, pageIndex, scale]);
 
   const handleNext = useCallback(() => {
     onNavigate((pageIndex + 1) % pages.length);
