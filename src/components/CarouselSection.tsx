@@ -75,6 +75,8 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const imageRef = useRef<HTMLImageElement>(null);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
+  const touchEndX = useRef(0);
+  const touchEndY = useRef(0);
   const lastTouchTime = useRef(0);
   const mobileIndicatorTimeout = useRef<NodeJS.Timeout>();
   const loadingTimeout = useRef<NodeJS.Timeout>();
@@ -231,22 +233,45 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   }, []);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
-    const touchEndX = e.changedTouches[0].clientX;
-    const diff = touchStartX.current - touchEndX;
-    
-    if (Math.abs(diff) > 50) {
-      if (diff > 0) {
+    touchEndX.current = e.changedTouches[0].clientX;
+    touchEndY.current = e.changedTouches[0].clientY;
+    const diffX = touchStartX.current - touchEndX.current;
+    const diffY = touchStartY.current - touchEndY.current;
+    const tapThreshold = 10;
+    const swipeThreshold = 50;
+    const isTap = Math.abs(diffX) < tapThreshold && Math.abs(diffY) < tapThreshold;
+
+    if (isTap) {
+      const image = imageRef.current;
+      if (image) {
+        const imageRect = image.getBoundingClientRect();
+        const isWithinImage =
+          touchEndX.current >= imageRect.left &&
+          touchEndX.current <= imageRect.right &&
+          touchEndY.current >= imageRect.top &&
+          touchEndY.current <= imageRect.bottom;
+
+        if (isWithinImage) {
+          const relativeX = (touchEndX.current - imageRect.left) / imageRect.width;
+          if (relativeX >= 0.3 && relativeX <= 0.7) {
+            onOpenLightbox(currentPage);
+          }
+        }
+      }
+    } else if (Math.abs(diffX) > swipeThreshold) {
+      if (diffX > 0) {
         navigateTo("next");
       } else {
         navigateTo("prev");
       }
     }
+
     lastTouchTime.current = Date.now();
-    
+
     mobileIndicatorTimeout.current = setTimeout(() => {
       setMobileIndicator(false);
     }, 1000);
-  }, [navigateTo]);
+  }, [currentPage, navigateTo, onOpenLightbox]);
 
   // Calculate animation class
   const getExitAnimationClass = () => {
