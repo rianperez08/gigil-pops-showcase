@@ -35,6 +35,10 @@ const Index = () => {
     setLightboxOpen(false);
   }, []);
 
+  const handleNavigateLightbox = useCallback((pageIndex: number) => {
+    setLightboxPage(pageIndex);
+  }, []);
+
   return (
     <div className="min-h-screen">
       <Navbar onAboutClick={handleAboutOpen} />
@@ -51,6 +55,7 @@ const Index = () => {
       <Lightbox 
         isOpen={lightboxOpen} 
         pageIndex={lightboxPage} 
+        onNavigate={handleNavigateLightbox}
         onClose={handleCloseLightbox} 
       />
       
