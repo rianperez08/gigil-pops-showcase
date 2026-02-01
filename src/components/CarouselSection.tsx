@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 // Full resolution images (for Lightbox)
 import pg1 from "@/assets/pages/pg1.png";
+import pg2 from "@/assets/pages/pg2.png";
+import pg3 from "@/assets/pages/pg3.png";
+import pg4 from "@/assets/pages/pg4.png";
+import pg5 from "@/assets/pages/pg5.png";
+import pg6 from "@/assets/pages/pg6.png";
 import pg7 from "@/assets/pages/pg7.png";
 import pg8 from "@/assets/pages/pg8.png";
 import pg9 from "@/assets/pages/pg9.png";
@@ -20,25 +25,24 @@ import pg4Compressed from "@/assets/pages-compressed/pg4.png";
 import pg5Compressed from "@/assets/pages-compressed/pg5.png";
 import pg6Compressed from "@/assets/pages-compressed/pg6.png";
 
-// Carousel uses compressed where available, falls back to full-res
 const carouselPages = [
-  pg1, // No compressed version yet
-  pg2Compressed,
-  pg3Compressed,
-  pg4Compressed,
-  pg5Compressed,
-  pg6Compressed,
-  pg7, // No compressed version yet
-  pg8,
-  pg9,
-  pg10,
-  pg11,
-  pg12,
-  pg13,
-  pg14,
-  pg15,
-  pg16,
-  pg17,
+  { src: pg1, full: pg1 },
+  { src: pg2Compressed, full: pg2 },
+  { src: pg3Compressed, full: pg3 },
+  { src: pg4Compressed, full: pg4 },
+  { src: pg5Compressed, full: pg5 },
+  { src: pg6Compressed, full: pg6 },
+  { src: pg7, full: pg7 },
+  { src: pg8, full: pg8 },
+  { src: pg9, full: pg9 },
+  { src: pg10, full: pg10 },
+  { src: pg11, full: pg11 },
+  { src: pg12, full: pg12 },
+  { src: pg13, full: pg13 },
+  { src: pg14, full: pg14 },
+  { src: pg15, full: pg15 },
+  { src: pg16, full: pg16 },
+  { src: pg17, full: pg17 },
 ];
 
 interface CarouselSectionProps {
@@ -57,14 +61,19 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const sectionRef = useRef<HTMLElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
   const mobileIndicatorTimeout = useRef<NodeJS.Timeout>();
   const animationDuration = 400;
 
   // Preload carousel images on mount (compressed versions for speed)
   useEffect(() => {
-    carouselPages.forEach((src) => {
+    carouselPages.forEach(({ src, full }) => {
       const img = new Image();
       img.src = src;
+      if (full !== src) {
+        const fullImage = new Image();
+        fullImage.src = full;
+      }
     });
   }, []);
 
@@ -140,10 +149,21 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   // Touch handlers for mobile swipe
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
     setMobileIndicator(true);
     
     if (mobileIndicatorTimeout.current) {
       clearTimeout(mobileIndicatorTimeout.current);
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length !== 1) return;
+    const moveX = e.touches[0].clientX - touchStartX.current;
+    const moveY = e.touches[0].clientY - touchStartY.current;
+
+    if (Math.abs(moveX) > Math.abs(moveY)) {
+      e.preventDefault();
     }
   }, []);
 
@@ -179,13 +199,14 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
     <section 
       ref={sectionRef}
       id="carousel"
-      className="relative min-h-screen w-full flex items-center justify-center py-16 md:py-24 cursor-pointer"
+      className="relative min-h-screen w-full flex items-center justify-center py-16 md:py-24 cursor-pointer touch-pan-y"
       onClick={handleClick}
       style={{ background: '#000' }}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
       {/* Cursor indicator - desktop only */}
@@ -219,7 +240,8 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
         }}
       >
         <img
-          src={carouselPages[currentPage]}
+          src={carouselPages[currentPage].src}
+          srcSet={`${carouselPages[currentPage].src} 1x, ${carouselPages[currentPage].full} 2x`}
           alt=""
           aria-hidden="true"
           className="w-full h-auto opacity-0 pointer-events-none select-none"
@@ -228,14 +250,16 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
         <div className="absolute inset-0">
           <img
             ref={imageRef}
-            src={carouselPages[currentPage]}
+            src={carouselPages[currentPage].src}
+            srcSet={`${carouselPages[currentPage].src} 1x, ${carouselPages[currentPage].full} 2x`}
             alt={`Page ${currentPage + 1}`}
             className={`absolute inset-0 w-full h-full object-contain ${getExitAnimationClass()}`}
             draggable={false}
           />
           {nextPage !== null && (
             <img
-              src={carouselPages[nextPage]}
+              src={carouselPages[nextPage].src}
+              srcSet={`${carouselPages[nextPage].src} 1x, ${carouselPages[nextPage].full} 2x`}
               alt={`Page ${nextPage + 1}`}
               className={`absolute inset-0 w-full h-full object-contain ${getEnterAnimationClass()}`}
               draggable={false}
