@@ -32,6 +32,7 @@ const Lightbox = ({ isOpen, pageIndex, onNavigate, onClose }: LightboxProps) => 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
+  const touchStartRef = useRef({ x: 0, y: 0, time: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Reset on close/open or page change
@@ -113,6 +114,15 @@ const Lightbox = ({ isOpen, pageIndex, onNavigate, onClose }: LightboxProps) => 
         x: e.touches[0].clientX - position.x,
         y: e.touches[0].clientY - position.y,
       };
+      return;
+    }
+
+    if (scale === 1 && e.touches.length === 1) {
+      touchStartRef.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+        time: Date.now(),
+      };
     }
   }, [scale, position]);
 
@@ -125,9 +135,36 @@ const Lightbox = ({ isOpen, pageIndex, onNavigate, onClose }: LightboxProps) => 
     }
   }, [isDragging]);
 
-  const handleTouchEnd = useCallback(() => {
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     setIsDragging(false);
-  }, []);
+    if (scale !== 1) {
+      return;
+    }
+
+    const { x: startX, y: startY, time } = touchStartRef.current;
+    if (!time) {
+      return;
+    }
+
+    const endTouch = e.changedTouches[0];
+    if (!endTouch) {
+      return;
+    }
+
+    const deltaX = endTouch.clientX - startX;
+    const deltaY = endTouch.clientY - startY;
+    const duration = Date.now() - time;
+    const isSwipe = Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) && duration < 600;
+
+    if (isSwipe) {
+      const nextIndex = deltaX < 0
+        ? (pageIndex + 1) % pages.length
+        : (pageIndex - 1 + pages.length) % pages.length;
+      onNavigate(nextIndex);
+    }
+
+    touchStartRef.current = { x: 0, y: 0, time: 0 };
+  }, [scale, pageIndex, onNavigate]);
 
   const handleNext = useCallback(() => {
     onNavigate((pageIndex + 1) % pages.length);
@@ -220,6 +257,12 @@ const Lightbox = ({ isOpen, pageIndex, onNavigate, onClose }: LightboxProps) => 
           draggable={false}
         />
       </div>
+
+      {scale === 1 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 text-xs text-white/70 bg-black/40 px-3 py-1 rounded-full">
+          Swipe to navigate
+        </div>
+      )}
     </div>
   );
 };
