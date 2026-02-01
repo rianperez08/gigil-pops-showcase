@@ -252,10 +252,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
           touchEndY.current <= imageRect.bottom;
 
         if (isWithinImage) {
-          const relativeX = (touchEndX.current - imageRect.left) / imageRect.width;
-          if (relativeX >= 0.3 && relativeX <= 0.7) {
-            onOpenLightbox(currentPage);
-          }
+          onOpenLightbox(currentPage);
         }
       }
     } else if (Math.abs(diffX) > swipeThreshold) {
