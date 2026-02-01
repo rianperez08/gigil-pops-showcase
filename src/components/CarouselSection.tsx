@@ -80,6 +80,24 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const loadedPages = useRef<Set<number>>(new Set([0]));
   const animationDuration = 400;
 
+  const preloadImage = useCallback(async (pageIndex: number) => {
+    if (loadedPages.current.has(pageIndex)) return;
+    await new Promise<void>((resolve) => {
+      const img = new Image();
+      img.src = carouselPages[pageIndex].src;
+      if ("decode" in img) {
+        img
+          .decode()
+          .then(() => resolve())
+          .catch(() => resolve());
+      } else {
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+      }
+    });
+    loadedPages.current.add(pageIndex);
+  }, []);
+
   // Preload carousel images on mount (compressed versions for speed)
   useEffect(() => {
     carouselPages.forEach(({ src, full }) => {
@@ -92,6 +110,13 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
     });
   }, []);
 
+  useEffect(() => {
+    const nextIndex = (currentPage + 1) % carouselPages.length;
+    const prevIndex = (currentPage - 1 + carouselPages.length) % carouselPages.length;
+    preloadImage(nextIndex);
+    preloadImage(prevIndex);
+  }, [currentPage, preloadImage]);
+
   const navigateTo = useCallback(async (direction: "prev" | "next") => {
     if (isAnimating) return;
     const targetPage = direction === "next"
@@ -99,21 +124,8 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       : (currentPage - 1 + carouselPages.length) % carouselPages.length;
 
     setIsAnimating(true);
-    setSlideDirection(direction === "next" ? "left" : "right");
-    setNextPage(targetPage);
 
     const shouldPreload = !loadedPages.current.has(targetPage);
-    const preloadPromise = shouldPreload
-      ? (() => {
-          const img = new Image();
-          img.src = carouselPages[targetPage].src;
-          return img.decode();
-        })()
-      : Promise.resolve();
-    const animationPromise = new Promise((resolve) => {
-      setTimeout(resolve, animationDuration);
-    });
-
     if (shouldPreload) {
       if (loadingTimeout.current) {
         clearTimeout(loadingTimeout.current);
@@ -121,9 +133,15 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       loadingTimeout.current = setTimeout(() => {
         setIsLoading(true);
       }, animationDuration);
+      await preloadImage(targetPage);
     }
 
-    await Promise.all([preloadPromise, animationPromise]);
+    setSlideDirection(direction === "next" ? "left" : "right");
+    setNextPage(targetPage);
+
+    await new Promise((resolve) => {
+      setTimeout(resolve, animationDuration);
+    });
 
     if (loadingTimeout.current) {
       clearTimeout(loadingTimeout.current);
