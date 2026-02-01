@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { X, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { X, ZoomIn, ZoomOut, RotateCcw, Smartphone } from "lucide-react";
 import pg1 from "@/assets/pages/pg1.png";
 import pg2 from "@/assets/pages/pg2.png";
 import pg3 from "@/assets/pages/pg3.png";
@@ -221,6 +221,14 @@ const Lightbox = ({ isOpen, pageIndex, onNavigate, onClose }: LightboxProps) => 
         >
           <span className="text-white text-2xl leading-none">›</span>
         </button>
+      </div>
+
+      <div
+        className="hidden sm:hidden fixed bottom-4 left-4 right-4 z-50 flex-col items-center gap-2 text-white text-xs tracking-[0.2em] uppercase [@media(orientation:portrait)]:flex [@media(orientation:portrait)]:justify-center"
+        aria-hidden="true"
+      >
+        <Smartphone className="h-6 w-6 rotate-90 text-white/80" />
+        <span className="text-center text-white/80">TURN ON AUTO-ROTATE ON YOUR PHONE</span>
       </div>
 
       {/* Image */}
