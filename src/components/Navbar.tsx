@@ -8,7 +8,7 @@ const Navbar = ({ onAboutClick }: NavbarProps) => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-6 py-4 md:px-10 md:py-6">
       {/* Logo */}
-      <a href="/" className="block">
+      <a href="https://gigil.com.ph" className="block">
         <img 
           src={logo} 
           alt="GIGIL POPS" 
