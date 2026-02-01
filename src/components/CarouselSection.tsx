@@ -305,7 +305,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
       >
         <img
           src={carouselPages[currentPage].src}
-          srcSet={`${carouselPages[currentPage].src} 1x, ${carouselPages[currentPage].full} 2x`}
+          srcSet={`${carouselPages[currentPage].src} 1x`}
           alt=""
           aria-hidden="true"
           className="w-full h-auto opacity-0 pointer-events-none select-none"
@@ -315,7 +315,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
           <img
             ref={imageRef}
             src={carouselPages[currentPage].src}
-            srcSet={`${carouselPages[currentPage].src} 1x, ${carouselPages[currentPage].full} 2x`}
+            srcSet={`${carouselPages[currentPage].src} 1x`}
             alt={`Page ${currentPage + 1}`}
             className={`absolute inset-0 w-full h-full object-contain ${getExitAnimationClass()}`}
             draggable={false}
@@ -323,7 +323,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
           {nextPage !== null && (
             <img
               src={carouselPages[nextPage].src}
-              srcSet={`${carouselPages[nextPage].src} 1x, ${carouselPages[nextPage].full} 2x`}
+              srcSet={`${carouselPages[nextPage].src} 1x`}
               alt={`Page ${nextPage + 1}`}
               className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-200 ${isLoading ? "opacity-80" : "opacity-100"} ${getEnterAnimationClass()}`}
               draggable={false}
