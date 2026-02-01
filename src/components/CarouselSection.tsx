@@ -69,12 +69,15 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
   const [showCursor, setShowCursor] = useState(false);
   const [mobileIndicator, setMobileIndicator] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   
   const sectionRef = useRef<HTMLElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const mobileIndicatorTimeout = useRef<NodeJS.Timeout>();
+  const loadingTimeout = useRef<NodeJS.Timeout>();
+  const loadedPages = useRef<Set<number>>(new Set([0]));
   const animationDuration = 400;
 
   // Preload carousel images on mount (compressed versions for speed)
@@ -89,7 +92,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
     });
   }, []);
 
-  const navigateTo = useCallback((direction: "prev" | "next") => {
+  const navigateTo = useCallback(async (direction: "prev" | "next") => {
     if (isAnimating) return;
     const targetPage = direction === "next"
       ? (currentPage + 1) % carouselPages.length
@@ -99,12 +102,40 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
     setSlideDirection(direction === "next" ? "left" : "right");
     setNextPage(targetPage);
 
-    setTimeout(() => {
-      setCurrentPage(targetPage);
-      setNextPage(null);
-      setSlideDirection(null);
-      setIsAnimating(false);
-    }, animationDuration);
+    const shouldPreload = !loadedPages.current.has(targetPage);
+    const preloadPromise = shouldPreload
+      ? (() => {
+          const img = new Image();
+          img.src = carouselPages[targetPage].src;
+          return img.decode();
+        })()
+      : Promise.resolve();
+    const animationPromise = new Promise((resolve) => {
+      setTimeout(resolve, animationDuration);
+    });
+
+    if (shouldPreload) {
+      if (loadingTimeout.current) {
+        clearTimeout(loadingTimeout.current);
+      }
+      loadingTimeout.current = setTimeout(() => {
+        setIsLoading(true);
+      }, animationDuration);
+    }
+
+    await Promise.all([preloadPromise, animationPromise]);
+
+    if (loadingTimeout.current) {
+      clearTimeout(loadingTimeout.current);
+    }
+    if (shouldPreload) {
+      loadedPages.current.add(targetPage);
+    }
+    setIsLoading(false);
+    setCurrentPage(targetPage);
+    setNextPage(null);
+    setSlideDirection(null);
+    setIsAnimating(false);
   }, [animationDuration, currentPage, isAnimating]);
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
@@ -273,7 +304,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
               src={carouselPages[nextPage].src}
               srcSet={`${carouselPages[nextPage].src} 1x, ${carouselPages[nextPage].full} 2x`}
               alt={`Page ${nextPage + 1}`}
-              className={`absolute inset-0 w-full h-full object-contain ${getEnterAnimationClass()}`}
+              className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-200 ${isLoading ? "opacity-80" : "opacity-100"} ${getEnterAnimationClass()}`}
               draggable={false}
             />
           )}
