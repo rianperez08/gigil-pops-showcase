@@ -23,29 +23,36 @@ const pages = [pg1, pg2, pg3, pg4, pg5, pg6, pg7, pg8, pg9, pg10, pg11, pg12, pg
 interface LightboxProps {
   isOpen: boolean;
   pageIndex: number;
+  onNavigate: (pageIndex: number) => void;
   onClose: () => void;
 }
 
-const Lightbox = ({ isOpen, pageIndex, onClose }: LightboxProps) => {
+const Lightbox = ({ isOpen, pageIndex, onNavigate, onClose }: LightboxProps) => {
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Reset on close/open
+  // Reset on close/open or page change
   useEffect(() => {
     if (isOpen) {
       setScale(1);
       setPosition({ x: 0, y: 0 });
     }
-  }, [isOpen]);
+  }, [isOpen, pageIndex]);
 
   // Handle Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
+      }
+      if (e.key === "ArrowRight") {
+        onNavigate((pageIndex + 1) % pages.length);
+      }
+      if (e.key === "ArrowLeft") {
+        onNavigate((pageIndex - 1 + pages.length) % pages.length);
       }
     };
 
@@ -58,7 +65,7 @@ const Lightbox = ({ isOpen, pageIndex, onClose }: LightboxProps) => {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, onNavigate, pageIndex]);
 
   const handleZoomIn = useCallback(() => {
     setScale((prev) => Math.min(prev + 0.5, 4));
@@ -122,11 +129,13 @@ const Lightbox = ({ isOpen, pageIndex, onClose }: LightboxProps) => {
     setIsDragging(false);
   }, []);
 
-  const handleBackdropClick = useCallback((e: React.MouseEvent) => {
-    if (e.target === containerRef.current) {
-      onClose();
-    }
-  }, [onClose]);
+  const handleNext = useCallback(() => {
+    onNavigate((pageIndex + 1) % pages.length);
+  }, [onNavigate, pageIndex]);
+
+  const handlePrev = useCallback(() => {
+    onNavigate((pageIndex - 1 + pages.length) % pages.length);
+  }, [onNavigate, pageIndex]);
 
   if (!isOpen) return null;
 
@@ -135,7 +144,6 @@ const Lightbox = ({ isOpen, pageIndex, onClose }: LightboxProps) => {
       ref={containerRef}
       className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 animate-fade-in"
       style={{ backdropFilter: 'blur(8px)' }}
-      onClick={handleBackdropClick}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
@@ -169,6 +177,23 @@ const Lightbox = ({ isOpen, pageIndex, onClose }: LightboxProps) => {
           aria-label="Close lightbox"
         >
           <X className="w-5 h-5 text-white" />
+        </button>
+      </div>
+
+      <div className="fixed left-4 right-4 flex items-center justify-between z-50">
+        <button
+          onClick={handlePrev}
+          className="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+          aria-label="Previous image"
+        >
+          <span className="text-white text-2xl leading-none">‹</span>
+        </button>
+        <button
+          onClick={handleNext}
+          className="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+          aria-label="Next image"
+        >
+          <span className="text-white text-2xl leading-none">›</span>
         </button>
       </div>
 
