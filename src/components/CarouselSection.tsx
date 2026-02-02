@@ -94,8 +94,8 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
           .then(() => resolve())
           .catch(() => resolve());
       } else {
-        img.onload = () => resolve();
-        img.onerror = () => resolve();
+        (img as HTMLImageElement).onload = () => resolve();
+        (img as HTMLImageElement).onerror = () => resolve();
       }
     });
     loadedPages.current.add(pageIndex);
@@ -281,11 +281,15 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
     return slideDirection === "left" ? "page-enter-right" : "page-enter-left";
   };
 
+  const handleDownloadClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <section 
       ref={sectionRef}
       id="carousel"
-      className="relative min-h-screen w-full flex items-center justify-center py-16 md:py-24 cursor-pointer touch-pan-y"
+      className="relative min-h-screen w-full flex flex-col items-center justify-center py-16 md:py-24 cursor-pointer touch-pan-y"
       onClick={handleClick}
       style={{ background: '#000' }}
       onMouseMove={handleMouseMove}
@@ -316,6 +320,17 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
           {currentPage + 1} / {carouselPages.length}
         </div>
       )}
+
+      {/* Download button - Desktop (bottom left) */}
+      <a
+        href="https://drive.google.com/file/d/1h1ZJIIs_XflVttQ_MEsDvqnsZdhjhq25/view?usp=sharing"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={handleDownloadClick}
+        className="hidden md:flex absolute bottom-8 left-8 z-20 items-center justify-center px-5 py-2.5 border border-white/80 rounded-full text-white text-sm font-medium tracking-wider hover:bg-white hover:text-black transition-colors duration-200 cursor-pointer"
+      >
+        DOWNLOAD PDF
+      </a>
       
       {/* Spread container */}
       <div 
@@ -353,6 +368,17 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
           )}
         </div>
       </div>
+
+      {/* Download button - Mobile (below carousel) */}
+      <a
+        href="https://drive.google.com/file/d/1h1ZJIIs_XflVttQ_MEsDvqnsZdhjhq25/view?usp=sharing"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={handleDownloadClick}
+        className="md:hidden mt-6 z-20 flex items-center justify-center px-6 py-3 border border-white/80 rounded-full text-white text-sm font-medium tracking-wider hover:bg-white hover:text-black transition-colors duration-200 cursor-pointer"
+      >
+        DOWNLOAD PDF
+      </a>
     </section>
   );
 };
