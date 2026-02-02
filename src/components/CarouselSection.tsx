@@ -375,7 +375,7 @@ const CarouselSection = ({ onOpenLightbox }: CarouselSectionProps) => {
         target="_blank"
         rel="noopener noreferrer"
         onClick={handleDownloadClick}
-        className="md:hidden mt-6 z-20 flex items-center justify-center px-6 py-3 border border-white/80 rounded-full text-white text-sm font-medium tracking-wider hover:bg-white hover:text-black transition-colors duration-200 cursor-pointer"
+        className="md:hidden mt-4 z-20 flex items-center justify-center px-4 py-2 border border-white/80 rounded-full text-white text-xs font-medium tracking-wider hover:bg-white hover:text-black transition-colors duration-200 cursor-pointer"
       >
         DOWNLOAD PDF
       </a>
